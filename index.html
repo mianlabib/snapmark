@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>SnapMark – Free In-Browser Screenshot Editor &amp; Annotation Tool</title>
+  
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="SnapMark – Free In-Browser Screenshot Editor &amp; Annotation Tool">
+  <meta name="description" content="Free, fast, and private in-browser screenshot editor. Annotate screenshots with arrows, shapes, text, steps, blur sensitive data, and crop instantly. 100% client-side with zero tracking or uploads.">
+  <meta name="keywords" content="screenshot editor, online screenshot tool, annotate image, blur screenshot, crop image, draw arrows on image, markup tool, screenshot annotation, privacy-first editor, client-side image editor">
+  <meta name="author" content="SnapMark">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="SnapMark">
+
+  <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="SnapMark – In-Browser Screenshot Editor &amp; Annotation Tool">
+  <meta property="og:description" content="Annotate screenshots with arrows, shapes, text, step badges, blur sensitive data, and crop quickly right inside your browser. No signup, no installation required.">
+  <meta property="og:site_name" content="SnapMark">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SnapMark – In-Browser Screenshot Editor &amp; Annotation Tool">
+  <meta name="twitter:description" content="Free, fast, and private screenshot editor. Draw shapes, arrows, blur sensitive data, and crop with keyboard shortcuts.">
+
+  <!-- SVG Favicon (Crisp vector on all screen resolutions) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M16 23l7-7 3 3-7 7-3-3z' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M22 17l-1.5-7.5L6 6l3.5 14.5L17 22l5-5z' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='15' cy='15' r='2' fill='%23ffffff'/%3E%3C/svg%3E">
+
+  <!-- Structured Data (JSON-LD for Google Rich Results) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "SnapMark",
+    "headline": "SnapMark – Free In-Browser Screenshot Editor",
+    "description": "Fast and private client-side screenshot editor. Crop, blur sensitive info, draw arrows, add text, steps, and shapes directly in your browser with zero installation.",
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires HTML5 canvas and JavaScript support",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Rectangle, Circle, Arrow, and Line annotations",
+      "Freehand Pen and Highlighting",
+      "Pixelate and Blur for privacy",
+      "Numbered step badges for tutorials",
+      "Crop tool with aspect lock",
+      "Copy directly to clipboard",
+      "Download high-res PNG",
+      "Dark and Light theme"
+    ]
+  }
+  </script>
+  <style>
+    :root {
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      --bg: #eef1f6;
+      --surface: #ffffff;
+      --text: #1b1f27;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --soft: #eef2ff;
+      --on: #ffffff;
+      --chk: #cbd5e1;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+      --radius: 8px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0f172a;
+        --surface: #1e293b;
+        --text: #f1f5f9;
+        --muted: #94a3b8;
+        --border: #334155;
+        --accent: #6366f1;
+        --accent-hover: #818cf8;
+        --soft: #312e81;
+        --on: #ffffff;
+        --chk: #1e293b;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --border: #334155;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --soft: #312e81;
+      --on: #ffffff;
+      --chk: #1e293b;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.4;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* Header styling */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      z-index: 10;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 16px;
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      letter-spacing: -0.3px;
+    }
+
+    .logo i {
+      font-style: normal;
+      background: var(--accent);
+      color: var(--on);
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sp {
+      flex: 1;
+    }
+
+    /* Context toolbar */
+    .ctx {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: thin;
+      z-index: 9;
+    }
+
+    .g {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      padding-right: 10px;
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .g:last-child {
+      border: 0;
+      padding-right: 0;
+    }
+
+    /* Buttons */
+    button,
+    .btn {
+      font: inherit;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 6px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      line-height: 1;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    button svg,
+    .btn svg {
+      flex-shrink: 0;
+    }
+
+    button:hover:not(:disabled),
+    .btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--soft);
+    }
+
+    button:active:not(:disabled),
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      border-color: var(--border) !important;
+      color: var(--muted) !important;
+      background: transparent !important;
+    }
+
+    .pri {
+      background: var(--accent);
+      color: var(--on);
+      border-color: var(--accent);
+    }
+
+    .pri:hover:not(:disabled) {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+      color: var(--on);
+    }
+
+    .sm {
+      padding: 5px 9px;
+      font-size: 12px;
+      border-radius: 6px;
+    }
+
+    .btn-icon {
+      padding: 6px;
+      width: 32px;
+      height: 32px;
+    }
+
+    /* Inputs */
+    input[type="color"] {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: none;
+      cursor: pointer;
+      vertical-align: middle;
+    }
+
+    input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    input[type="color"]::-webkit-color-swatch {
+      border: none;
+      border-radius: 5px;
+    }
+
+    input[type="range"] {
+      width: 90px;
+      height: 6px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .sw {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      padding: 0;
+      border: 2px solid var(--surface);
+      box-shadow: 0 0 0 1px var(--border);
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .sw:hover {
+      transform: scale(1.15);
+    }
+
+    .sw.active {
+      box-shadow: 0 0 0 2px var(--accent);
+      transform: scale(1.1);
+    }
+
+    /* Body & Left Tool Rail */
+    .body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+    }
+
+    nav#rail {
+      width: 70px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px 6px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      flex-shrink: 0;
+    }
+
+    .t {
+      flex: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      padding: 7px 2px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: var(--radius);
+      min-width: 52px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .t b {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      color: var(--text);
+      transition: color 0.15s ease;
+    }
+
+    .t:hover {
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .t.on {
+      background: var(--soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .t.on b {
+      color: var(--accent);
+    }
+
+    /* Canvas Work Area */
+    .work {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      overflow: auto;
+      padding: 24px;
+      background: var(--bg);
+      position: relative;
+    }
+
+    .stage {
+      margin: auto;
+      position: relative;
+      flex: none;
+      line-height: 0;
+      box-shadow: var(--shadow-lg);
+      border-radius: 4px;
+      overflow: hidden;
+      background: repeating-conic-gradient(var(--chk) 0 25%, transparent 0 50%) 0 0 / 16px 16px;
+    }
+
+    canvas {
+      display: block;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    /* Empty state */
+    #empty {
+      margin: auto;
+      width: min(540px, 92%);
+      padding: 48px 24px;
+      text-align: center;
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    #empty.drag {
+      border-color: var(--accent);
+      background: var(--soft);
+      transform: scale(1.02);
+    }
+
+    #empty .ico {
+      font-size: 48px;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    #empty h2 {
+      margin: 8px 0 6px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    #empty p {
+      margin: 6px 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    kbd {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-family: inherit;
+      color: var(--text);
+      box-shadow: var(--shadow-sm);
+    }
+
+    #ti {
+      position: absolute;
+      display: none;
+      background: transparent;
+      border: 1px dashed var(--accent);
+      outline: none;
+      font-family: system-ui, sans-serif;
+      font-weight: 700;
+      padding: 0;
+      margin: 0;
+      line-height: 1.2;
+      min-width: 60px;
+      z-index: 10;
+    }
+
+    /* Footer Status Bar */
+    footer {
+      padding: 6px 16px;
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 32px;
+    }
+
+    /* Toast notification */
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(44px + env(safe-area-inset-bottom, 0px));
+      transform: translateX(-50%) translateY(10px);
+      background: var(--text);
+      color: var(--surface);
+      padding: 8px 16px;
+      border-radius: 24px;
+      font-size: 12px;
+      font-weight: 500;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 99;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .body {
+        flex-direction: column;
+      }
+
+      nav#rail {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+        padding: 6px 8px;
+        overflow-x: auto;
+      }
+
+      .t {
+        min-width: 48px;
+        padding: 4px 6px;
+      }
+
+      .g {
+        border-right: none;
+      }
+
+      .work {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <i>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19l7-7 3 3-7 7-3-3z" />
+            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+            <circle cx="11" cy="11" r="2" />
+          </svg>
+        </i>
+        SnapMark
+      </div>
+
+      <div class="sp"></div>
+
+      <label class="btn" for="file" title="Upload an image">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        Upload
+      </label>
+      <input type="file" id="file" accept="image/*" hidden>
+
+      <button id="copy" disabled title="Copy edited screenshot to clipboard">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        </svg>
+        Copy
+      </button>
+
+      <button id="dl" class="pri" disabled title="Save as PNG">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        Download PNG
+      </button>
+
+      <button id="theme" class="btn-icon" title="Toggle Dark/Light Mode">
+        <svg id="theme-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      </button>
+    </header>
+
+    <!-- Context Toolbar -->
+    <div class="ctx">
+      <!-- Color Picker & Swatches -->
+      <div class="g">
+        <input type="color" id="col" value="#ff3b30" title="Custom color picker">
+        <button class="sw active" style="background:#ff3b30" data-c="#ff3b30" title="Red"></button>
+        <button class="sw" style="background:#facc15" data-c="#facc15" title="Yellow"></button>
+        <button class="sw" style="background:#22c55e" data-c="#22c55e" title="Green"></button>
+        <button class="sw" style="background:#3b82f6" data-c="#3b82f6" title="Blue"></button>
+        <button class="sw" style="background:#111827" data-c="#111827" title="Black"></button>
+        <button class="sw" style="background:#ffffff" data-c="#ffffff" title="White"></button>
+      </div>
+
+      <!-- Stroke / Font Size -->
+      <div class="g">
+        <span style="color:var(--muted);font-weight:500;">Size</span>
+        <input type="range" id="sz" min="1" max="14" value="4" title="Line / Font thickness">
+        <span id="szl"
+          style="font-variant-numeric:tabular-nums;color:var(--muted);min-width:24px;font-size:12px;">4px</span>
+      </div>
+
+      <!-- Object Operations -->
+      <div class="g">
+        <button class="sm" id="dup" title="Duplicate selection (Ctrl+D)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+          Duplicate
+        </button>
+        <button class="sm" id="fr" title="Bring to Front">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2" />
+            <polyline points="2 17 12 22 22 17" />
+            <polyline points="2 12 12 17 22 12" />
+          </svg>
+          Front
+        </button>
+        <button class="sm" id="bk" title="Send to Back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="7 13 12 18 17 13" />
+            <polyline points="7 6 12 11 17 6" />
+          </svg>
+          Back
+        </button>
+        <button class="sm" id="del" title="Delete selected object (Delete/Backspace)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            <line x1="10" y1="11" x2="10" y2="17" />
+            <line x1="14" y1="11" x2="14" y2="17" />
+          </svg>
+          Delete
+        </button>
+      </div>
+
+      <!-- History -->
+      <div class="g">
+        <button class="sm" id="undo" title="Undo (Ctrl+Z)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7v6h6" />
+            <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
+          </svg>
+        </button>
+        <button class="sm" id="redo" title="Redo (Ctrl+Y)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 7v6h-6" />
+            <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13" />
+          </svg>
+        </button>
+        <button class="sm" id="clear" title="Clear all annotations">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+          </svg>
+          Clear all
+        </button>
+      </div>
+
+      <!-- Crop Actions (Contextual) -->
+      <div class="g" id="cropg" style="display:none">
+        <button class="sm pri" id="cok" title="Apply crop">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          Apply crop
+        </button>
+        <button class="sm" id="cno" title="Cancel crop">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+          Cancel
+        </button>
+      </div>
+
+      <div class="sp"></div>
+
+      <!-- Zoom Controls -->
+      <div class="g">
+        <button class="sm" id="zo" title="Zoom out">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            <line x1="8" y1="11" x2="14" y2="11" />
+          </svg>
+        </button>
+        <span id="zl"
+          style="min-width:44px;text-align:center;font-variant-numeric:tabular-nums;font-weight:600;font-size:12px;">100%</span>
+        <button class="sm" id="zi" title="Zoom in">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            <line x1="11" y1="8" x2="11" y2="14" />
+            <line x1="8" y1="11" x2="14" y2="11" />
+          </svg>
+        </button>
+        <button class="sm" id="zf" title="Fit to screen">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+          </svg>
+          Fit
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="body">
+      <!-- Left Rail Tools -->
+      <nav id="rail">
+        <button class="t" data-t="select" title="Select / Move (V)">
+          <b>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3l7 18 3-7 7-3L3 3z" />
+            </svg>
+          </b>
+          Select
+        </button>
+
+        <button class="t on" data-t="rect" title="Rectangle (S)">
+          <b>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            </svg>
+          </b>
+          Square
+        </button>
+
+        <button class="t" data-t="ellipse" title="Circle (O)">
+          <b>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9" />
+            </svg>
+          </b>
+          Circle
+        </button>
+
+        <button class="t" data-t="arrow" title="Arrow (A)">
+          <b>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="19" x2="19" y2="5" />
+              <polyline points="10 5 19 5 19 14" />
+            </svg>
+          </b>
+          Arrow
+        </button>
+
+        <button class="t" data-t="line" title="Line (L)">
+          <b>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" y1="20" x2="20" y2="4" />
+            </svg>
+          </b>
+          Line
+        </button>
+
+        <button class="t" data-t="pen" title="Freehand Pen (P)">
+          <b>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 19l7-7 3 3-7 7-3-3z" />
+              <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+            </svg>
+          </b>
+          Pen
+        </button>
+
+        <button class="t" data-t="hl" title="Highlight Area (H)">
+          <b>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 11-6 6v3h3l6-6" />
+              <path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4" />
+            </svg>
+          </b>
+          Mark
+        </button>
+
+        <button class="t" data-t="text" title="Text (T)">
+          <b>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="4 7 4 4 20 4 20 7" />
+              <line x1="9" y1="20" x2="15" y2="20" />
+              <line x1="12" y1="4" x2="12" y2="20" />
+            </svg>
+          </b>
+          Text
+        </button>
+
+        <button class="t" data-t="num" title="Step Badge (N)">
+          <b>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 8v8" />
+              <path d="M10 10l2-2" />
+            </svg>
+          </b>
+          Step
+        </button>
+
+        <button class="t" data-t="blur" title="Blur / Obscure (B)">
+          <b>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="1" />
+              <line x1="3" y1="9" x2="21" y2="9" />
+              <line x1="3" y1="15" x2="21" y2="15" />
+              <line x1="9" y1="3" x2="9" y2="21" />
+              <line x1="15" y1="3" x2="15" y2="21" />
+            </svg>
+          </b>
+          Blur
+        </button>
+
+        <button class="t" data-t="crop" title="Crop Image (C)">
+          <b>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6.13 1L6 16a2 2 0 0 0 2 2h15" />
+              <path d="M1 6.13L16 6a2 2 0 0 1 2 2v15" />
+            </svg>
+          </b>
+          Crop
+        </button>
+      </nav>
+
+      <!-- Center Stage Area -->
+      <section class="work" id="work">
+        <div id="empty">
+          <div class="ico">
+            <svg width="68" height="68" viewBox="0 0 100 72" xmlns="http://www.w3.org/2000/svg">
+              <path fill="#E7F7FF" d="M0 0h100v44H0V0z" />
+              <path fill="#3498DB"
+                d="M84 69.199l13.938-13.938V38.945C96.829 38.741 96 37.95 96 37.001h-1c0 1.104-1.119 2-2.5 2s-2.5-.896-2.5-2h-1c0 1.104-1.119 2-2.5 2s-2.5-.896-2.5-2h-1c0 1.104-1.119 2-2.5 2s-2.5-.896-2.5-2h-1c0 1.104-1.119 2-2.5 2s-2.5-.896-2.5-2h-1c0 1.104-1.119 2-2.5 2s-2.5-.896-2.5-2h-1c0 1.104-1.119 2-2.5 2s-2.5-.896-2.5-2h-1c0 1.104-1.119 2-2.5 2s-2.5-.896-2.5-2h-1c0 1.104-1.119 2-2.5 2s-2.5-.896-2.5-2h-1c0 1.104-1.119 2-2.5 2s-2.5-.896-2.5-2h-1c0 1.104-1.119 2-2.5 2s-2.5-.896-2.5-2h-1c0 1.104-1.119 2-2.5 2s-2.5-.896-2.5-2h-1c0 1.104-1.119 2-2.5 2s-2.5-.896-2.5-2h-1c0 1.104-1.119 2-2.5 2s-2.5-.896-2.5-2h-1c0 1.104-1.119 2-2.5 2s-2.5-.896-2.5-2H5c0 1.104-1.119 2-2.5 2s-2.5-.896-2.5-2V69.2l84-.001z" />
+              <path fill="#2F89C5" d="M65 46v2h34v-2H65zm2 6h32v-2H67v2zm-2 4h31v-2H65v2zm6 4h18v-2H71v2z" />
+              <path fill="#2C81BA" d="M70.801 69.199H84V56z" />
+              <path fill="#F39C12"
+                d="M15.726 57.883c1.529 0 2.768-.99 2.768-2.215h1.107c0 1.225 1.239 2.215 2.768 2.215 1.529 0 2.768-.99 2.768-2.215h1.107c0 1.225 1.239 2.215 2.768 2.215 1.529 0 2.769-.99 2.769-2.215h1.106c0 1.225 1.24 2.215 2.769 2.215 1.529 0 2.769-.99 2.769-2.215h1.105c0 1.225 1.238 2.215 2.768 2.215.342 0 .668-.057.969-.146l9.736-9.734s-35.977-.004-36 0h-4V56c.197 1.062 1.336 1.883 2.723 1.883z" />
+              <path fill="#34495E" d="M20 38h3v10h-3V38z" />
+              <path fill="#F1C40E" d="M20 45h25L20 20v25z" />
+              <path fill="#EBEDEE" d="M0 0v72h84l4-5H5V5h90v55l5-4V0z" />
+              <path fill="#BDC3C7" d="M84 72V56h16L84 72z" />
+              <path fill="#C3E4F8"
+                d="M63.807 20.031c.119-.323.193-.667.193-1.031a3 3 0 0 0-3-3c-.382 0-.744.078-1.08.209A4 4 0 0 0 56 13h-1a4 4 0 0 0-4 4v1c0 .798.24 1.537.643 2.16A2.495 2.495 0 0 0 52.5 25h11a2.492 2.492 0 1 0 .307-4.969z" />
+              <path fill="#ffffff"
+                d="M71.357 23.16A3.962 3.962 0 0 0 72 21v-1a4 4 0 0 0-4-4h-1a4 4 0 0 0-3.92 3.209A2.958 2.958 0 0 0 62 19c-1.656 0-3 1.345-3 3 0 .364.075.708.193 1.031A2.492 2.492 0 0 0 59.5 28h11a2.494 2.494 0 1 0 .857-4.84z" />
+              <path fill="#DA8C11" d="M53 48H13v2h38z" />
+              <path fill="#C8CACB" d="M73 67l-5 5h16v-5z" />
+              <path fill="#2875A8" d="M84 60v-2h-2l-2 2z" />
+            </svg>
+          </div>
+          <h2>Paste screenshot here</h2>
+          <p>Press <kbd>Ctrl</kbd> + <kbd>V</kbd> (Mac: <kbd>⌘</kbd> + <kbd>V</kbd>), or drag &amp; drop an image</p>
+          <label class="btn pri" for="file">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Upload image
+          </label>
+        </div>
+
+        <div class="stage" id="stage" style="display:none">
+          <canvas id="cv"></canvas>
+          <input id="ti" type="text" autocomplete="off" spellcheck="false">
+        </div>
+      </section>
+    </div>
+
+    <!-- Status Bar Footer -->
+    <footer id="st">Ready — Paste a screenshot or upload an image</footer>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const cv = $('cv');
+    const ctx = cv.getContext('2d');
+    const ti = $('ti');
+    const work = $('work');
+    const tmp = document.createElement('canvas');
+
+    const LBL = {
+      rect: 'Rectangle',
+      ellipse: 'Circle',
+      arrow: 'Arrow',
+      line: 'Line',
+      pen: 'Pen',
+      hl: 'Highlight',
+      text: 'Text',
+      num: 'Step',
+      blur: 'Blur'
+    };
+
+    const CUR = {
+      select: 'default',
+      text: 'text'
+    };
+
+    let img = null;
+    let shapes = [];
+    let sel = null;
+    let tool = 'rect';
+    let color = '#ff3b30';
+    let sz = 4;
+    let hist = [];
+    let hi = -1;
+    let drag = null;
+    let cur = null;
+    let cropR = null;
+    let editing = null;
+    let tpos = null;
+    let curZ = 1;
+    let zoom = 0;
+
+    const toast = msg => {
+      const t = $('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => t.classList.remove('show'), 1800);
+    };
+
+    const K = () => Math.max(1, cv.width / 900);
+    const disp = () => cv.getBoundingClientRect().width / cv.width || 1;
+
+    const pos = e => {
+      const r = cv.getBoundingClientRect();
+      return {
+        x: (e.clientX - r.left) * cv.width / r.width,
+        y: (e.clientY - r.top) * cv.height / r.height
+      };
+    };
+
+    const nrm = s => ({
+      x: Math.min(s.x1, s.x2),
+      y: Math.min(s.y1, s.y2),
+      w: Math.abs(s.x2 - s.x1),
+      h: Math.abs(s.y2 - s.y1)
+    });
+
+    const fsOf = s => (10 + s.w * 3) * K();
+    const numR = s => (9 + s.w * 3) * K();
+    const clone = o => JSON.parse(JSON.stringify(o));
+
+    const dark = hex => {
+      const n = parseInt(hex.slice(1), 16);
+      return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000 > 150 ? '#111827' : '#ffffff';
+    };
+
+    function drawShape(s) {
+      const lw = s.w * K();
+      ctx.save();
+      ctx.strokeStyle = s.c;
+      ctx.fillStyle = s.c;
+      ctx.lineWidth = lw;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      if (s.t === 'rect') {
+        ctx.strokeRect(s.x1, s.y1, s.x2 - s.x1, s.y2 - s.y1);
+      } else if (s.t === 'hl') {
+        ctx.globalAlpha = 0.38;
+        ctx.fillRect(s.x1, s.y1, s.x2 - s.x1, s.y2 - s.y1);
+      } else if (s.t === 'ellipse') {
+        ctx.beginPath();
+        ctx.ellipse(
+          (s.x1 + s.x2) / 2,
+          (s.y1 + s.y2) / 2,
+          Math.abs(s.x2 - s.x1) / 2,
+          Math.abs(s.y2 - s.y1) / 2,
+          0, 0, Math.PI * 2
+        );
+        ctx.stroke();
+      } else if (s.t === 'line') {
+        ctx.beginPath();
+        ctx.moveTo(s.x1, s.y1);
+        ctx.lineTo(s.x2, s.y2);
+        ctx.stroke();
+      } else if (s.t === 'arrow') {
+        const a = Math.atan2(s.y2 - s.y1, s.x2 - s.x1);
+        const h = (10 + s.w * 3) * K();
+        ctx.beginPath();
+        ctx.moveTo(s.x1, s.y1);
+        ctx.lineTo(s.x2 - Math.cos(a) * h * 0.6, s.y2 - Math.sin(a) * h * 0.6);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(s.x2, s.y2);
+        ctx.lineTo(s.x2 - h * Math.cos(a - 0.45), s.y2 - h * Math.sin(a - 0.45));
+        ctx.lineTo(s.x2 - h * Math.cos(a + 0.45), s.y2 - h * Math.sin(a + 0.45));
+        ctx.closePath();
+        ctx.fill();
+      } else if (s.t === 'pen') {
+        ctx.beginPath();
+        s.p.forEach((q, i) => i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y));
+        if (s.p.length === 1) ctx.lineTo(s.p[0].x + 0.1, s.p[0].y);
+        ctx.stroke();
+      } else if (s.t === 'text') {
+        ctx.font = '700 ' + fsOf(s) + 'px system-ui, sans-serif';
+        ctx.textBaseline = 'top';
+        ctx.fillText(s.s, s.x1, s.y1);
+      } else if (s.t === 'num') {
+        const r = numR(s);
+        ctx.beginPath();
+        ctx.arc(s.x1, s.y1, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = dark(s.c);
+        ctx.font = '700 ' + (r * 1.15) + 'px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(s.n, s.x1, s.y1 + r * 0.06);
+      } else if (s.t === 'blur') {
+        const b = nrm(s);
+        if (b.w < 2 || b.h < 2) {
+          ctx.restore();
+          return;
+        }
+        const px = Math.max(3, (3 + s.w * 2) * K());
+        const tw = Math.max(1, Math.round(b.w / px));
+        const th = Math.max(1, Math.round(b.h / px));
+        tmp.width = tw;
+        tmp.height = th;
+        tmp.getContext('2d').drawImage(img, b.x, b.y, b.w, b.h, 0, 0, tw, th);
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(tmp, 0, 0, tw, th, b.x, b.y, b.w, b.h);
+      }
+      ctx.restore();
+    }
+
+    function bounds(s) {
+      if (s.t === 'pen') {
+        let a = 1e9, b = 1e9, c = -1e9, d = -1e9;
+        s.p.forEach(q => {
+          a = Math.min(a, q.x);
+          b = Math.min(b, q.y);
+          c = Math.max(c, q.x);
+          d = Math.max(d, q.y);
+        });
+        return { x: a, y: b, w: c - a, h: d - b };
+      }
+      if (s.t === 'text') {
+        ctx.font = '700 ' + fsOf(s) + 'px system-ui, sans-serif';
+        return { x: s.x1, y: s.y1, w: ctx.measureText(s.s).width, h: fsOf(s) * 1.2 };
+      }
+      if (s.t === 'num') {
+        const r = numR(s);
+        return { x: s.x1 - r, y: s.y1 - r, w: 2 * r, h: 2 * r };
+      }
+      return nrm(s);
+    }
+
+    function segD(p, s) {
+      const dx = s.x2 - s.x1;
+      const dy = s.y2 - s.y1;
+      const l = dx * dx + dy * dy;
+      let t = l ? ((p.x - s.x1) * dx + (p.y - s.y1) * dy) / l : 0;
+      t = Math.max(0, Math.min(1, t));
+      return Math.hypot(p.x - s.x1 - t * dx, p.y - s.y1 - t * dy);
+    }
+
+    const isLn = s => s.t === 'line' || s.t === 'arrow';
+
+    function hit(s, p) {
+      const t = 8 / disp() + s.w * K() / 2;
+      if (isLn(s)) return segD(p, s) <= t;
+      if (s.t === 'pen') {
+        return s.p.some((q, i) =>
+          i ? segD(p, { x1: s.p[i - 1].x, y1: s.p[i - 1].y, x2: q.x, y2: q.y }) <= t : Math.hypot(p.x - q.x, p.y - q.y) <= t
+        );
+      }
+      const b = bounds(s);
+      const ins = p.x >= b.x - t && p.x <= b.x + b.w + t && p.y >= b.y - t && p.y <= b.y + b.h + t;
+      if (s.t === 'rect' || s.t === 'ellipse') {
+        return ins && !(p.x > b.x + t && p.x < b.x + b.w - t && p.y > b.y + t && p.y < b.y + b.h - t);
+      }
+      return ins;
+    }
+
+    const inBox = (s, p) => {
+      if (isLn(s)) return hit(s, p);
+      const b = bounds(s);
+      const t = 6 / disp();
+      return p.x >= b.x - t && p.x <= b.x + b.w + t && p.y >= b.y - t && p.y <= b.y + b.h + t;
+    };
+
+    function handles(s) {
+      if (isLn(s)) return [{ k: 'p1', x: s.x1, y: s.y1 }, { k: 'p2', x: s.x2, y: s.y2 }];
+      if (!['rect', 'ellipse', 'hl', 'blur'].includes(s.t)) return [];
+      const b = nrm(s);
+      const xs = [b.x, b.x + b.w / 2, b.x + b.w];
+      const ys = [b.y, b.y + b.h / 2, b.y + b.h];
+      return [
+        ['nw', 0, 0], ['n', 1, 0], ['ne', 2, 0],
+        ['e', 2, 1], ['se', 2, 2], ['s', 1, 2],
+        ['sw', 0, 2], ['w', 0, 1]
+      ].map(([k, i, j]) => ({ k, x: xs[i], y: ys[j] }));
+    }
+
+    function mv(s, o, dx, dy) {
+      if (s.p) {
+        s.p = o.p.map(q => ({ x: q.x + dx, y: q.y + dy }));
+      } else {
+        s.x1 = o.x1 + dx;
+        s.y1 = o.y1 + dy;
+        if (o.x2 !== undefined) {
+          s.x2 = o.x2 + dx;
+          s.y2 = o.y2 + dy;
+        }
+      }
+    }
+
+    function resize(s, k, p) {
+      if (k === 'p1') {
+        s.x1 = p.x;
+        s.y1 = p.y;
+      } else if (k === 'p2') {
+        s.x2 = p.x;
+        s.y2 = p.y;
+      } else {
+        if (k.includes('n')) s.y1 = p.y;
+        if (k.includes('s')) s.y2 = p.y;
+        if (k.includes('w')) s.x1 = p.x;
+        if (k.includes('e')) s.x2 = p.x;
+      }
+    }
+
+    function norm(s) {
+      const b = nrm(s);
+      s.x1 = b.x;
+      s.y1 = b.y;
+      s.x2 = b.x + b.w;
+      s.y2 = b.y + b.h;
+    }
+
+    function render(exp) {
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      if (img) ctx.drawImage(img, 0, 0);
+
+      shapes.forEach(s => {
+        if (!s.hidden) drawShape(s);
+      });
+
+      if (cur && cur.t !== 'crop') drawShape(cur);
+
+      if (!exp) {
+        if (sel) {
+          const b = bounds(sel);
+          const d = 1 / disp();
+          ctx.save();
+          ctx.strokeStyle = '#4f46e5';
+          ctx.fillStyle = '#ffffff';
+          ctx.lineWidth = 1.5 * d;
+          ctx.setLineDash([6 * d, 4 * d]);
+          if (!isLn(sel)) {
+            ctx.strokeRect(b.x - 3 * d, b.y - 3 * d, b.w + 6 * d, b.h + 6 * d);
+          }
+          ctx.setLineDash([]);
+          handles(sel).forEach(h => {
+            ctx.beginPath();
+            ctx.rect(h.x - 5 * d, h.y - 5 * d, 10 * d, 10 * d);
+            ctx.fill();
+            ctx.stroke();
+          });
+          ctx.restore();
+        }
+
+        const c = cur && cur.t === 'crop' ? cur : cropR;
+        if (c) {
+          const b = nrm(c);
+          ctx.save();
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.58)';
+          ctx.beginPath();
+          ctx.rect(0, 0, cv.width, cv.height);
+          ctx.rect(b.x, b.y, b.w, b.h);
+          ctx.fill('evenodd');
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2 / disp();
+          ctx.strokeRect(b.x, b.y, b.w, b.h);
+          ctx.restore();
+        }
+        ui();
+      }
+    }
+
+    function ui() {
+      const has = !!img;
+      $('undo').disabled = hi < 1;
+      $('redo').disabled = hi >= hist.length - 1;
+      $('clear').disabled = !shapes.length;
+      $('copy').disabled = $('dl').disabled = !has;
+
+      ['dup', 'fr', 'bk', 'del'].forEach(i => $(i).disabled = !sel);
+      $('cropg').style.display = cropR ? 'flex' : 'none';
+
+      $('st').textContent = has
+        ? `${cv.width} × ${cv.height} px  ·  ${shapes.length} object${shapes.length === 1 ? '' : 's'}${sel ? '  ·  Selected: ' + LBL[sel.t] : ''}`
+        : 'Ready — Paste a screenshot or upload an image';
+    }
+
+    function sync() {
+      if (sel) {
+        color = sel.c;
+        sz = sel.w;
+        $('col').value = color;
+        $('sz').value = sz;
+        $('szl').textContent = sz + 'px';
+        updateSwatches(color);
+      }
+    }
+
+    function updateSwatches(activeColor) {
+      document.querySelectorAll('.sw').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.c.toLowerCase() === activeColor.toLowerCase());
+      });
+    }
+
+    /* History management */
+    function commit() {
+      hist = hist.slice(0, hi + 1);
+      hist.push({ img, shapes: JSON.stringify(shapes) });
+      if (hist.length > 60) hist.shift();
+      hi = hist.length - 1;
+    }
+
+    function go(i) {
+      if (i < 0 || i >= hist.length) return;
+      commitText();
+      hi = i;
+      const st = hist[i];
+      img = st.img;
+      shapes = JSON.parse(st.shapes);
+      if (cv.width !== img.width || cv.height !== img.height) {
+        cv.width = img.width;
+        cv.height = img.height;
+        applyZoom();
+      }
+      sel = null;
+      cropR = null;
+      render();
+    }
+
+    $('undo').onclick = () => go(hi - 1);
+    $('redo').onclick = () => go(hi + 1);
+
+    /* Image Loading */
+    function load(src) {
+      const im = new Image();
+      im.onload = () => {
+        img = im;
+        cv.width = im.width;
+        cv.height = im.height;
+        shapes = [];
+        sel = null;
+        cropR = null;
+        hist = [];
+        hi = -1;
+        commit();
+        $('empty').style.display = 'none';
+        $('stage').style.display = 'block';
+        zoom = 0;
+        applyZoom();
+        render();
+        toast('Image loaded successfully');
+      };
+      im.onerror = () => toast('Failed to load image');
+      im.src = src;
+    }
+
+    function loadFile(f) {
+      if (f && f.type.startsWith('image/')) {
+        const r = new FileReader();
+        r.onload = () => load(r.result);
+        r.readAsDataURL(f);
+      } else {
+        toast('Please select an image file');
+      }
+    }
+
+    document.addEventListener('paste', e => {
+      if (document.activeElement === ti) return;
+      const it = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+      if (it) {
+        e.preventDefault();
+        loadFile(it.getAsFile());
+      } else {
+        toast('No image found in clipboard');
+      }
+    });
+
+    $('file').onchange = e => {
+      loadFile(e.target.files[0]);
+      e.target.value = '';
+    };
+
+    document.addEventListener('dragover', e => {
+      e.preventDefault();
+      $('empty').classList.add('drag');
+    });
+
+    document.addEventListener('dragleave', e => {
+      $('empty').classList.remove('drag');
+    });
+
+    document.addEventListener('drop', e => {
+      e.preventDefault();
+      $('empty').classList.remove('drag');
+      loadFile(e.dataTransfer.files[0]);
+    });
+
+    /* Zoom functionality */
+    function applyZoom() {
+      if (!img) return;
+      let z = zoom;
+      if (!z) {
+        z = Math.min(1, (work.clientWidth - 48) / cv.width, (work.clientHeight - 48) / cv.height);
+      }
+      z = Math.max(0.05, Math.min(6, z));
+      curZ = z;
+      cv.style.width = (cv.width * z) + 'px';
+      cv.style.height = (cv.height * z) + 'px';
+      $('zl').textContent = Math.round(z * 100) + '%';
+    }
+
+    const setZ = z => {
+      zoom = Math.max(0.1, Math.min(6, z));
+      applyZoom();
+      render();
+    };
+
+    $('zi').onclick = () => setZ(curZ * 1.25);
+    $('zo').onclick = () => setZ(curZ / 1.25);
+    $('zf').onclick = () => {
+      zoom = 0;
+      applyZoom();
+      render();
+    };
+
+    window.addEventListener('resize', () => {
+      if (!zoom) {
+        applyZoom();
+        render();
+      }
+    });
+
+    work.addEventListener('wheel', e => {
+      if (e.ctrlKey && img) {
+        e.preventDefault();
+        setZ(curZ * (e.deltaY < 0 ? 1.1 : 1 / 1.1));
+      }
+    }, { passive: false });
+
+    /* Tool switching & Properties */
+    function setTool(t) {
+      commitText();
+      tool = t;
+      if (t !== 'select') sel = null;
+      if (t !== 'crop') cropR = null;
+      document.querySelectorAll('.t').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+      cv.style.cursor = CUR[t] || 'crosshair';
+      render();
+    }
+
+    $('rail').onclick = e => {
+      const b = e.target.closest('.t');
+      if (b) setTool(b.dataset.t);
+    };
+
+    const setCol = c => {
+      color = c;
+      $('col').value = c;
+      updateSwatches(c);
+      if (sel) {
+        sel.c = c;
+        render();
+        commit();
+      }
+    };
+
+    $('col').oninput = e => {
+      color = e.target.value;
+      updateSwatches(color);
+      if (sel) {
+        sel.c = color;
+        render();
+      }
+    };
+
+    $('col').onchange = () => {
+      if (sel) commit();
+    };
+
+    document.querySelectorAll('.sw').forEach(b => {
+      b.onclick = () => setCol(b.dataset.c);
+    });
+
+    $('sz').oninput = e => {
+      sz = +e.target.value;
+      $('szl').textContent = sz + 'px';
+      if (sel) {
+        sel.w = sz;
+        render();
+      }
+    };
+
+    $('sz').onchange = e => {
+      if (sel) commit();
+      e.target.blur();
+    };
+
+    /* Pointer & Drag Interactions */
+    const pick = p => sel && inBox(sel, p) ? sel : [...shapes].reverse().find(s => hit(s, p));
+
+    cv.addEventListener('pointerdown', e => {
+      if (!img) return;
+      const p = pos(e);
+      commitText();
+
+      if (tool === 'select') {
+        if (sel) {
+          const h = handles(sel).find(h => Math.hypot(h.x - p.x, h.y - p.y) <= 11 / disp());
+          if (h) {
+            cv.setPointerCapture(e.pointerId);
+            if (h.k[0] !== 'p') norm(sel);
+            drag = { m: 'rs', k: h.k, p };
+            return;
+          }
+        }
+        sel = pick(p) || null;
+        sync();
+        if (sel) {
+          cv.setPointerCapture(e.pointerId);
+          drag = { m: 'mv', p, o: clone(sel) };
+        }
+        render();
+        return;
+      }
+
+      if (tool === 'text') {
+        drag = { m: 'text', p };
+        return;
+      }
+
+      if (tool === 'num') {
+        const n = Math.max(0, ...shapes.filter(s => s.t === 'num').map(s => s.n)) + 1;
+        shapes.push({ t: 'num', x1: p.x, y1: p.y, n, c: color, w: sz });
+        commit();
+        render();
+        return;
+      }
+
+      cv.setPointerCapture(e.pointerId);
+      cur = tool === 'pen'
+        ? { t: 'pen', p: [p], c: color, w: sz }
+        : { t: tool, x1: p.x, y1: p.y, x2: p.x, y2: p.y, c: color, w: sz };
+      drag = { m: 'draw' };
+      render();
+    });
+
+    cv.addEventListener('pointermove', e => {
+      const p = pos(e);
+      if (drag) {
+        if (drag.m === 'mv') {
+          mv(sel, drag.o, p.x - drag.p.x, p.y - drag.p.y);
+        } else if (drag.m === 'rs') {
+          resize(sel, drag.k, p);
+        } else if (drag.m === 'draw') {
+          if (cur.t === 'pen') cur.p.push(p);
+          else { cur.x2 = p.x; cur.y2 = p.y; }
+        } else {
+          return;
+        }
+        drag.moved = true;
+        render();
+        return;
+      }
+
+      if (tool === 'select' && img) {
+        const h = sel && handles(sel).find(h => Math.hypot(h.x - p.x, h.y - p.y) <= 11 / disp());
+        cv.style.cursor = h
+          ? ({ nw: 'nwse-resize', se: 'nwse-resize', ne: 'nesw-resize', sw: 'nesw-resize', n: 'ns-resize', s: 'ns-resize', e: 'ew-resize', w: 'ew-resize' }[h.k] || 'crosshair')
+          : pick(p) ? 'move' : 'default';
+      }
+    });
+
+    function up() {
+      if (!drag) return;
+      const d = drag;
+      drag = null;
+      if (d.m === 'text') {
+        setTimeout(() => openText(d.p), 30);
+        return;
+      }
+      if (d.m === 'draw') {
+        const c = cur;
+        cur = null;
+        if (c.t === 'crop') {
+          if (Math.abs(c.x2 - c.x1) > 10 && Math.abs(c.y2 - c.y1) > 10) cropR = c;
+        } else if (c.t === 'pen' || Math.hypot(c.x2 - c.x1, c.y2 - c.y1) > 4) {
+          shapes.push(c);
+          commit();
+        }
+      } else if (d.moved) {
+        commit();
+      }
+      render();
+    }
+
+    cv.addEventListener('pointerup', up);
+    cv.addEventListener('pointercancel', up);
+
+    cv.addEventListener('dblclick', e => {
+      if (tool !== 'select') return;
+      const p = pos(e);
+      const s = [...shapes].reverse().find(s => s.t === 'text' && hit(s, p));
+      if (s) {
+        sel = s;
+        openText({ x: s.x1, y: s.y1 }, s);
+      }
+    });
+
+    /* Text Editing */
+    function openText(p, s) {
+      const d = disp();
+      const w = s || { w: sz, c: color };
+      tpos = p;
+      editing = s || null;
+      ti.style.cssText = `display:block;left:${p.x * d}px;top:${p.y * d}px;font-size:${fsOf(w) * d}px;color:${w.c};`;
+      ti.value = s ? s.s : '';
+      if (s) s.hidden = true;
+      render();
+      ti.focus();
+      ti.select();
+    }
+
+    function commitText() {
+      if (ti.style.display !== 'block') return;
+      const v = ti.value.trim();
+      ti.style.display = 'none';
+      if (editing) {
+        editing.hidden = false;
+        if (v) editing.s = v;
+        else {
+          shapes = shapes.filter(x => x !== editing);
+          sel = null;
+        }
+        commit();
+      } else if (v && tpos) {
+        shapes.push({ t: 'text', x1: tpos.x, y1: tpos.y, s: v, c: color, w: sz });
+        commit();
+      }
+      ti.value = '';
+      editing = null;
+      tpos = null;
+      render();
+    }
+
+    ti.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        commitText();
+      }
+      if (e.key === 'Escape') {
+        ti.value = editing ? editing.s : '';
+        commitText();
+      }
+    });
+
+    ti.addEventListener('blur', commitText);
+
+    /* Action Handlers */
+    const del = () => {
+      if (sel) {
+        shapes = shapes.filter(s => s !== sel);
+        sel = null;
+        commit();
+        render();
+      }
+    };
+
+    const dup = () => {
+      if (sel) {
+        const c = clone(sel);
+        mv(c, clone(sel), 20 * K(), 20 * K());
+        shapes.push(c);
+        sel = c;
+        commit();
+        render();
+      }
+    };
+
+    const order = forward => {
+      if (sel) {
+        shapes = shapes.filter(s => s !== sel);
+        forward ? shapes.push(sel) : shapes.unshift(sel);
+        commit();
+        render();
+      }
+    };
+
+    $('del').onclick = del;
+    $('dup').onclick = dup;
+    $('fr').onclick = () => order(true);
+    $('bk').onclick = () => order(false);
+    $('clear').onclick = () => {
+      shapes = [];
+      sel = null;
+      commit();
+      render();
+    };
+
+    $('cno').onclick = () => {
+      cropR = null;
+      render();
+    };
+
+    $('cok').onclick = () => {
+      const r = nrm(cropR);
+      const x = Math.max(0, Math.round(r.x));
+      const y = Math.max(0, Math.round(r.y));
+      const w = Math.min(img.width - x, Math.round(r.w));
+      const h = Math.min(img.height - y, Math.round(r.h));
+      if (w < 5 || h < 5) return;
+
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      c.getContext('2d').drawImage(img, x, y, w, h, 0, 0, w, h);
+      shapes.forEach(s => mv(s, clone(s), -x, -y));
+      img = c;
+      cv.width = w;
+      cv.height = h;
+      cropR = null;
+      sel = null;
+      commit();
+      zoom = 0;
+      applyZoom();
+      render();
+      toast('Cropped successfully');
+    };
+
+    $('dl').onclick = () => {
+      render(true);
+      cv.toBlob(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'snapmark-edited.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        toast('Download started');
+      });
+      render();
+    };
+
+    $('copy').onclick = async () => {
+      render(true);
+      const pr = new Promise(r => cv.toBlob(r));
+      render();
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': pr })]);
+        toast('Copied to clipboard');
+      } catch (err) {
+        toast('Clipboard copy blocked — use Download instead');
+      }
+    };
+
+    /* Theme Toggle */
+    function updateThemeIcon(isDark) {
+      const ico = $('theme-ico');
+      if (isDark) {
+        ico.innerHTML = `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+      } else {
+        ico.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+      }
+    }
+
+    $('theme').onclick = () => {
+      const root = document.documentElement;
+      const isDark = root.dataset.theme === 'dark' || (root.dataset.theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+      const nextDark = !isDark;
+      root.dataset.theme = nextDark ? 'dark' : 'light';
+      try { localStorage.setItem('snapmark_theme', root.dataset.theme); } catch (e) { }
+      updateThemeIcon(nextDark);
+    };
+
+    // Initialize theme preference from localStorage or OS
+    try {
+      const savedTheme = localStorage.getItem('snapmark_theme');
+      if (savedTheme) {
+        document.documentElement.dataset.theme = savedTheme;
+        updateThemeIcon(savedTheme === 'dark');
+      } else {
+        const initDark = matchMedia('(prefers-color-scheme: dark)').matches;
+        updateThemeIcon(initDark);
+      }
+    } catch (e) {
+      updateThemeIcon(matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+
+    // Zoom label click to reset to 100%
+    $('zl').style.cursor = 'pointer';
+    $('zl').title = 'Click to reset to 100%';
+    $('zl').onclick = () => setZ(1);
+
+    /* Keyboard Shortcuts */
+    document.addEventListener('keydown', e => {
+      if (document.activeElement === ti) return;
+      const m = e.ctrlKey || e.metaKey;
+      const k = e.key.toLowerCase();
+
+      if (m && k === 'z') {
+        e.preventDefault();
+        go(e.shiftKey ? hi + 1 : hi - 1);
+      } else if (m && k === 'y') {
+        e.preventDefault();
+        go(hi + 1);
+      } else if (m && k === 'd') {
+        e.preventDefault();
+        dup();
+      } else if (m && k === 's') {
+        e.preventDefault();
+        if (img) $('dl').click();
+      } else if (m && k === 'c' && !sel && img) {
+        e.preventDefault();
+        $('copy').click();
+      } else if (m) {
+        return;
+      } else if (k === 'enter') {
+        if (cropR) {
+          e.preventDefault();
+          $('cok').click();
+        }
+      } else if (k === 'delete' || k === 'backspace') {
+        if (sel) {
+          e.preventDefault();
+          del();
+        }
+      } else if (k === 'escape') {
+        sel = null;
+        cropR = null;
+        render();
+      } else if (k.startsWith('arrow') && sel) {
+        e.preventDefault();
+        const step = (e.shiftKey ? 10 : 1) * K();
+        const o = clone(sel);
+        mv(
+          sel, o,
+          k === 'arrowleft' ? -step : k === 'arrowright' ? step : 0,
+          k === 'arrowup' ? -step : k === 'arrowdown' ? step : 0
+        );
+        commit();
+        render();
+      } else {
+        const tools = {
+          v: 'select',
+          r: 'rect',
+          s: 'rect',
+          o: 'ellipse',
+          a: 'arrow',
+          l: 'line',
+          p: 'pen',
+          h: 'hl',
+          t: 'text',
+          n: 'num',
+          b: 'blur',
+          c: 'crop'
+        };
+        if (tools[k]) setTool(tools[k]);
+      }
+    });
+
+    ui();
+  </script>
+</body>
+
+</html>
