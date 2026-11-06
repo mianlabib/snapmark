@@ -4,7 +4,7 @@
 [![Pure Vanilla JS](https://img.shields.io/badge/Vanilla-HTML5%20%2F%20JS-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Privacy First](https://img.shields.io/badge/Privacy-100%25%20Client--Side-brightgreen.svg)](#-privacy--security)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-success.svg)](#-zero-dependencies)
-![Views](https://api.visitorbadge.io/api/visitors?path=mianlabib%2Fsnapmark&label=REPO%20VIEWS&countColor=%234f46e5)
+![Profile Views](https://komarev.com/ghpvc/?username=mianlabib&repo=snapmark&color=4f46e5&label=VIEWS)
 
 > **SnapMark** is a fast, lightweight, and privacy-first in-browser screenshot editor and annotation tool. Annotate images, blur sensitive credentials, draw arrows, add numbered steps, and export crisp PNGs in seconds—with zero installation and zero cloud uploads.
 
