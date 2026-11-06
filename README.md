@@ -4,6 +4,7 @@
 [![Pure Vanilla JS](https://img.shields.io/badge/Vanilla-HTML5%20%2F%20JS-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Privacy First](https://img.shields.io/badge/Privacy-100%25%20Client--Side-brightgreen.svg)](#-privacy--security)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-success.svg)](#-zero-dependencies)
+![Views](https://api.visitorbadge.io/api/visitors?path=mianlabib%2Fsnapmark&label=REPO%20VIEWS&countColor=%234f46e5)
 
 > **SnapMark** is a fast, lightweight, and privacy-first in-browser screenshot editor and annotation tool. Annotate images, blur sensitive credentials, draw arrows, add numbered steps, and export crisp PNGs in seconds—with zero installation and zero cloud uploads.
 
@@ -58,26 +59,6 @@
 
 ---
 
-## 🚀 Quick Start / Deployment
-
-SnapMark is packaged as a **single standalone HTML file** with zero build steps or npm packages required.
-
-### Option 1: Run Locally
-1. Clone or download this repository.
-2. Double-click `index.html` to open it in any modern browser (Chrome, Edge, Firefox, Safari, Brave).
-
-### Option 2: Deploy to GitHub Pages (Free Hosting)
-1. Create a new GitHub repository named `snapmark` (or `screenshot-editor`).
-2. Upload this file as `index.html`.
-3. Go to **Settings** > **Pages** in your repository.
-4. Under **Branch**, select `main` (root) and click **Save**.
-5. Your screenshot editor will be live at:
-   ```
-   https://<your-username>.github.io/<repo-name>/
-   ```
-
----
-
 ## 🛡️ Privacy & Security
 
 Most online image editors upload your screenshots to remote cloud servers to process them. SnapMark is built with privacy as the core priority:
@@ -85,14 +66,6 @@ Most online image editors upload your screenshots to remote cloud servers to pro
 - All rendering and manipulations are performed directly inside the browser using the HTML5 Canvas API.
 - Works 100% offline without an active internet connection.
 - Ideal for handling sensitive internal dashboards, credentials, personal data, and confidential tickets.
-
----
-
-## 🛠️ Built With
-
-- **HTML5 Canvas API:** High-performance, hardware-accelerated rendering.
-- **Pure Modern CSS3:** Custom variables, responsive layout, dark/light theme support.
-- **Modern ES6+ JavaScript:** Event-driven architecture, modular undo/redo state management, zero third-party dependencies.
 
 ---
 
